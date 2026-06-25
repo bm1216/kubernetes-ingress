@@ -58,7 +58,9 @@ class TestConfigRollbackStartup:
 
         print("Step 2: create startup resources before the controller starts")
         valid_ingress_name = create_ingress_from_yaml(kube_apis.networking_v1, test_namespace, ingress_src)
-        invalid_ingress_name = create_ingress_from_yaml(kube_apis.networking_v1, test_namespace, ingress_invalid_snippet_src)
+        invalid_ingress_name = create_ingress_from_yaml(
+            kube_apis.networking_v1, test_namespace, ingress_invalid_snippet_src
+        )
 
         print("Step 3: scale the ingress controller back up and wait for startup validation to finish")
         scale_deployment(kube_apis.v1, kube_apis.apps_v1_api, ingress_controller, ic_namespace, 1)
@@ -108,7 +110,9 @@ class TestConfigRollbackStartup:
         ic_namespace = ingress_controller_prerequisites.namespace
 
         print("Step 1: create the invalid ingress")
-        invalid_ingress_name = create_ingress_from_yaml(kube_apis.networking_v1, test_namespace, ingress_invalid_snippet_src)
+        invalid_ingress_name = create_ingress_from_yaml(
+            kube_apis.networking_v1, test_namespace, ingress_invalid_snippet_src
+        )
 
         print("Step 2: kill the ingress controller pod and inspect the latest pod state")
         old_ic_pod_name = get_first_pod_name(kube_apis.v1, ic_namespace)
@@ -120,7 +124,9 @@ class TestConfigRollbackStartup:
 
         print("Step 3: pod stays Running but not Ready, and default server is preserved")
         assert pod.status.phase == "Running"
-        ready_condition = next((condition for condition in (pod.status.conditions or []) if condition.type == "Ready"), None)
+        ready_condition = next(
+            (condition for condition in (pod.status.conditions or []) if condition.type == "Ready"), None
+        )
         assert ready_condition is not None
         assert ready_condition.status == "False"
         default_server_conf = get_default_server_conf(kube_apis.v1, ic_pod_name, ic_namespace)
@@ -179,7 +185,9 @@ class TestConfigRollbackStartup:
 
         print("Step 5: valid ingresses keep their active config files and never get error events")
         for current_ingress_name in [ingress_name, ingress_2_name]:
-            conf = get_ingress_nginx_template_conf(kube_apis.v1, test_namespace, current_ingress_name, ic_pod_name, ic_namespace)
+            conf = get_ingress_nginx_template_conf(
+                kube_apis.v1, test_namespace, current_ingress_name, ic_pod_name, ic_namespace
+            )
             assert "server_name" in conf
             current_events = get_events_for_object(kube_apis.v1, test_namespace, current_ingress_name)
             assert all(event.reason != "AddedOrUpdatedWithError" for event in current_events)

@@ -1,11 +1,11 @@
 """Tests for config rollback with Ingress resources."""
 
 import copy
+
 import pytest
 import yaml
 from settings import TEST_DATA
 from suite.utils.custom_assertions import (
-    assert_event,
     assert_ingress_conf_not_exists,
     assert_valid_ts,
     wait_and_assert_status_code,
